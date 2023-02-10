@@ -1,3 +1,5 @@
+from datetime import datetime
+
 
 COMMANDS_LIST = {
     '1': 'Создать новую заметку',
@@ -9,16 +11,20 @@ COMMANDS_LIST = {
     '0': 'Выход',
 }
 
+
 def greeting():
     print('Добро пожаловать в записную книжку!\n')
+
 
 def goodbye():
     print('Будем рады увидеть вас снова!')
 
-def menu():
+
+def show_menu():
     print('Выберите команду и нажмите соответствующую цифру:')
     for key, value in COMMANDS_LIST.items():
         print(f'{key} - {value}')
+    print()
     while True:
         choice = input('Введите номер команды: ')
         if choice in COMMANDS_LIST:
@@ -27,13 +33,6 @@ def menu():
         else:
             print('Команда не распознана. Попробуйте еще раз')
 
-def get_note_id():
-    while True:
-        id = input('Введите id-номер заметки: ')
-        try:
-            return int(id)
-        except:
-            print(f'Введенное значение {id} не является числом. Попробуйте еще раз')
 
 def get_note_id():
     while True:
@@ -43,3 +42,39 @@ def get_note_id():
         except:
             print(f'Введенное значение {id} не является числом. Попробуйте еще раз')
 
+
+def get_note_text():
+    title_required, text_required = True, True
+    while title_required:
+        title = input('Введите заголовок заметки: ')
+        if title:
+            title_required = False
+    while text_required:
+        text = input('Введите текст заметки: ')
+        if text:
+            text_required = False
+    return title, text
+
+
+def get_date():
+    while True:
+        date = input('Введите интересующую вас дату в формате ДД.ММ.ГГГГ : ')
+        try:
+            datetime.strptime(date, '%d.%m.%Y')
+            return date
+        except:
+            print(f'Указанная дата {date} некорректна. Попробуйте еще раз')
+
+
+def print_note(note):
+    print(f'ID: {note["id"]}\n{note["title"].upper()}\n{note["text"]}\nДата последнего изменения:{note["date"]}')
+
+
+def show_in_console(data):
+    if isinstance(data, list):
+        for note in data:
+            print_note(note)
+            print()
+    if isinstance(data, dict):
+        print_note(data)
+    print()

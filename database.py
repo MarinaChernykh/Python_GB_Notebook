@@ -1,18 +1,31 @@
 import json
+from datetime import datetime
 from model import Note
+
 
 DATABASE_NAME = 'my_notes.json'
 
 
 def write_to_database(data):
     with open(DATABASE_NAME, 'w', encoding='UTF-8') as base:
-        json.dump(data, base)
+        json.dump(data, base, indent=2)
 
 
 def get_notes_list():
     with open(DATABASE_NAME, 'r', encoding='UTF-8') as base:
-        data = json.load(base)
+        data = []
+        try:
+            data = json.load(base)
+        except:
+            print('Вы создали первую заметку!')
         return data
+
+def get_note(id):
+    data = get_notes_list()
+    for i in range(len(data)):
+        if data[i]['id'] == id:
+            return data[i]
+    print(f'Запись с id = {id} не найдена')
 
 
 def create_id_number(all_notes):
@@ -23,7 +36,7 @@ def create_id_number(all_notes):
     return id
 
 
-def create_new_note(title, text):
+def create(title, text):
     all_notes = get_notes_list()
     id = create_id_number(all_notes)
     new_note = Note(id, title, text)
@@ -31,13 +44,14 @@ def create_new_note(title, text):
     write_to_database(all_notes)
 
 
-def update_note(id, **kwargs):
+def update_note(id, title, text):
     data = get_notes_list()
     is_updated, i = False, 0
     while not is_updated and i < len(data):
         if data[i]['id'] == id:
-            for key, value in kwargs.items():
-                data[i][key] = value
+            data[i]['title'] = title
+            data[i]['text'] = text
+            data[i]['date'] = datetime.now().strftime("%d.%m.%Y %H:%M")
             is_updated = True
         i += 1
     if is_updated:
@@ -55,14 +69,7 @@ def delete_note(id):
             is_deleted = True
         i += 1
     if is_deleted:
+        print(f'Заметка с id = {id} успешно удалена')
         write_to_database(data)
     else:
         print(f'Запись с id = {id} не найдена')
-
-
-
-# create_new_note('test', 'Hello')
-# create_new_note('Вторая заметка', 'Всем привет')
-# print(get_notes_list())
-# # delete_note(3)
-# # print(get_notes_list())
